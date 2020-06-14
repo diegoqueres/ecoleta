@@ -1,19 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Feather as Icon } from '@expo/vector-icons';
 import { View, ImageBackground, Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import api from '../../services/api';
+import RNPickerSelect, { Item } from 'react-native-picker-select';
+
+interface IBGEUFs {
+  id: number;
+  sigla: string;
+  nome: string;
+}
+
+interface IBGECities {
+  id: number;
+  nome: string;
+}
 
 const Home = () => {
-  const [uf, setUf] = useState('');
-  const [city, setCity] = useState('');
+  const [isBusy, setBusy] = useState(true);
+  const [ufs, setUfs] = useState<IBGEUFs[]>([]);
+  const [cities, setCities] = useState<IBGECities[]>([]);
+  const [comboUFs, setComboUFs] = useState<Item[]>([]);
+  const [comboCities, setComboCities] = useState<Item[]>([]);
+  const [selectedUf, setSelectedUf] = useState('0');
+  const [selectedCity, setSelectedCity] = useState('0');
+
+  useEffect(() => {
+    setBusy(true);
+    async function fetchData() {
+    	api
+      	.get<IBGEUFs[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderby=nome')
+      	.then(response => {
+        	setUfs(response.data);
+        	setComboUFs(ufs.map((uf) => {
+          		return { key: uf.id, label: uf.nome, value: uf.sigla };
+        	}));
+      	});
+    	loadCities();
+    }
+    fetchData();
+    setBusy(false);
+  }, []);
+
+  function loadCities() {
+    if (selectedUf === '0') return;
+    setBusy(true);
+    async function fetchData() {
+    	api
+    	.get<IBGECities[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios?orderby=nome`)
+    	.then(response => {
+        	setCities(response.data);
+        	setComboCities(cities.map((city) => {
+        		return { key: city.id, label: city.nome, value: city.nome };
+        	}));
+    	});
+    }
+    fetchData();
+    setBusy(false);    
+  }
 
   const navigation = useNavigation();
 
+  function changeUF(value: string) {
+    setSelectedUf(value);
+    loadCities();
+  }
+
   function handleNavigateToPoints() {
     navigation.navigate('Points', {
-      uf,
-      city
+      selectedUf,
+      selectedCity
     });
   }
 
@@ -31,34 +88,32 @@ const Home = () => {
           </View>
         </View>
 
-        <View style={styles.footer}>
-          <TextInput 
-            style={styles.input} 
-            placeholder="Digite a UF" 
-            value={uf} 
-            onChangeText={setUf}
-            maxLength={2}
-            autoCapitalize="characters"
-            autoCorrect={false}
-          />
-          <TextInput 
-            style={styles.input} 
-            placeholder="Digite a Cidade" 
-            value={city} 
-            onChangeText={setCity}
-            autoCorrect={false}
-          />
-          <RectButton style={styles.button} onPress={handleNavigateToPoints}>
-            <View style={styles.buttonIcon}>
-              <Text>
-                <Icon name="arrow-right" color="#fff" size={24} />
-              </Text>
-            </View>
-            <Text style={styles.buttonText}>
-              Entrar
-          </Text>
-          </RectButton>
-        </View>
+        {isBusy ? (
+        	<Text style={styles.description}>Carregando as opções...</Text>
+        ) : (
+        	<View style={styles.footer}>
+          	<RNPickerSelect
+            	onValueChange={(value) => changeUF((value === null ? '0' : value))}
+            	placeholder={{ label: 'Selecione um estado', value: null }}
+            	items={comboUFs}
+          	/>
+          	<RNPickerSelect
+            	onValueChange={(value) => {setSelectedCity((value === null ? '0' : value))}}
+            	placeholder={{ label: 'Selecione uma cidade', value: null }}
+            	items={comboCities}
+          	/>
+          	<RectButton style={styles.button} onPress={handleNavigateToPoints}>
+            	<View style={styles.buttonIcon}>
+              	<Text>
+                	<Icon name="arrow-right" color="#fff" size={24} />
+              	</Text>
+            	</View>
+            	<Text style={styles.buttonText}>
+              	Entrar
+          	</Text>
+          	</RectButton>
+        	</View>
+        )}
 
       </ImageBackground>
     </KeyboardAvoidingView>

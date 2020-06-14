@@ -60,14 +60,9 @@ const Points = () => {
   }, []);
 
   useEffect(() => {
-    console.log('chamando items...');
     api.get('items')
     .then(response => {
-      console.log('response: ', response.data);
       setItems(response.data);
-    })
-    .catch(error => {
-      console.log(error.response);
     });
   }, []);
 
