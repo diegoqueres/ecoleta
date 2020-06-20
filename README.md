@@ -1,19 +1,19 @@
 # ecoleta
 ![EColeta](http://diegoqueres.net/ti/github/ecoleta/tela_1.png)
-Projeto **EColeta** *(coleta de resíduos)* desenvolvido durante a semana da **Next Level Week** *(organizada pela Rocketseat)*.
-
-
-
+<br/>
+<br/> 
+Projeto **EColeta**, destinado a facilitar o cadastro e procura por estabelecimentos de coleta de resíduos. Desenvolvido durante a semana da **Next Level Week 1**.  
+A **Next Level Week** é organizada pela *Rocketseat*.   
+<br/> 
+<br/> 
+<br/>  
 ## Iniciando
 Essas instruções fornecerão uma cópia do projeto para execução na sua máquina local, para fins de desenvolvimento. 
-
-
-
+<br/> 
+<br/>
 ### Pré-requisitos
 O que você já precisa ter instalado, antes de baixar esta aplicação:
-- Node.js instalado.
-
-
+- Node.js instalado.  
 
 ### Instalando 
 #### Camada da API Rest

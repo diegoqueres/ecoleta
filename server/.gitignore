@@ -1,2 +1,5 @@
 # Base de dados SQLite (deve ser recriada a cada instalação)
 src/database/database.sqlite
+
+# Upload de images de estabelecimentos
+uploads/points/
