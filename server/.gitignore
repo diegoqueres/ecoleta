@@ -1,0 +1,2 @@
+# Base de dados SQLite (deve ser recriada a cada instalação)
+src/database/database.sqlite
